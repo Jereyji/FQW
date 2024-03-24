@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "github.com/lib/pq"
 	"log"
 	"github.com/Jereyji/FQW.git"
 	"github.com/Jereyji/FQW.git/internal/handler"
@@ -13,7 +14,20 @@ func main() {
 	if err := initConfig(); err != nil {
 		log.Fatalf("Error initializing configs: %s", err.Error())
 	}
-	repos := repository.NewRepository()
+
+	db, err := repository.newPostgresDB(repository.Config{
+		Host: "localhost",
+		Port: "5436",
+		Username: "postgres",
+		Password: "qwerty",
+		DBName: "postgres",
+		SSLMode: "disable",
+	})
+	if err != nil {
+		log.Fatalf("Fail to initialize database: %s", err.Error())
+	}
+
+	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
