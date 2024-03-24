@@ -1,6 +1,6 @@
 package service
 
-import "github.com/Jereyji/FQW.git/pkg/repository"
+import "github.com/Jereyji/FQW.git/internal/repository"
 
 type Authorization interface {
 
@@ -20,6 +20,6 @@ type Service struct {
 	TodoItem
 }
 
-func NewService(repos *repository.Reposizitory) *Service {
+func NewService(repos *repository.Repository) *Service {
 	return &Service{}
 }

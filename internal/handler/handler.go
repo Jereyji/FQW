@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Jereyji/FQW.git/pkg/service"
+	"github.com/Jereyji/FQW.git/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
