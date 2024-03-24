@@ -1,12 +1,15 @@
 package main
 
 import (
-	_ "github.com/lib/pq"
 	"log"
+	"os"
+
 	"github.com/Jereyji/FQW.git"
 	"github.com/Jereyji/FQW.git/internal/handler"
 	"github.com/Jereyji/FQW.git/internal/repository"
 	"github.com/Jereyji/FQW.git/internal/service"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 )
 
@@ -15,13 +18,17 @@ func main() {
 		log.Fatalf("Error initializing configs: %s", err.Error())
 	}
 
-	db, err := repository.newPostgresDB(repository.Config{
-		Host: "localhost",
-		Port: "5436",
-		Username: "postgres",
-		Password: "qwerty",
-		DBName: "postgres",
-		SSLMode: "disable",
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Error loading env variables: %s", err.Error())
+	}
+
+	db, err := repository.NewPostgresDB(repository.Config{
+		Host: viper.GetString("db.host"),
+		Port: viper.GetString("db.port"),
+		Username: viper.GetString("db.username"),
+		DBName: viper.GetString("db.dbname"),
+		SSLMode: viper.GetString("db.sslmode"),
+		Password: os.Getenv("DB_PASSWORD"),
 	})
 	if err != nil {
 		log.Fatalf("Fail to initialize database: %s", err.Error())
