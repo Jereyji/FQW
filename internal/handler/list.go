@@ -1,9 +1,17 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 func (h *Handler) createList(c *gin.Context) {
+	id, ok := c.Get(userCtx)
+	if !ok {
 
+	}
+	
 }
 
 func (h *Handler) getAllLists(c *gin.Context) {
