@@ -42,7 +42,6 @@ func main() {
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
 		logrus.Fatalf("Error occured while running http server: %s", err.Error())
 	}
-
 }
 
 func initConfig() error {
@@ -50,6 +49,3 @@ func initConfig() error {
 	viper.SetConfigName("config")
 	return viper.ReadInConfig()
 }
-
-// docker run --name=FQW -e POSTGRES_PASSWORD='qwerty' -p 5436:5432 -d --rm postgres  
-// migrate -path ./schema -database 'postgres://postgres:qwerty@localhost:5436/postgres?sslmode=disable' up  
