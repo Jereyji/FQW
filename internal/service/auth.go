@@ -11,8 +11,7 @@ import (
 )
 
 const (
-	salt = "efghjghbivuhd2345fk12lkd0987"
-	signingkey = "dfgk34ldf513l#1!;dlsdfghvme[q"
+	signingkey = "8109612acafb4ae0ff34f5f1fa549577f4ca3a4a294f559498c111cc7d92973e5dde4eb64f086b49e063708705338f29b662047c09c850f5bb21da65f37036b4"
 	tokenTTL = 12 * time.Hour
 )
 
