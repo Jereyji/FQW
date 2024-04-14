@@ -1,14 +1,13 @@
 package service
 
 import (
-	"crypto/sha1"
 	"errors"
-	"fmt"
 	"time"
 
 	todo "github.com/Jereyji/FQW.git"
 	"github.com/Jereyji/FQW.git/internal/repository"
 	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -31,26 +30,36 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 }
 
 func (s *AuthService) CreateUser(user todo.User) (int, error) {
-	user.Password = generatePasswordHash(user.Password)
+	enc, err := encryptedString(user.Password)
+	if err != nil {
+		return 0, err
+	}
+	user.Password = enc
 	return s.repo.CreateUser(user)
 }
 
-func (s * AuthService) GenerateToken(username, password string) (string, error) {
-	user, err := s.repo.GetUser(username, generatePasswordHash(password))
-	if err != nil {
-		return "", err
-	}
+func (s *AuthService) GenerateToken(username, password string) (string, error) {
+    user, err := s.repo.GetUser(username)
+    if err != nil {
+        return "", err
+    }
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
-			IssuedAt: time.Now().Unix(),
-		},
-		user.Id,
-	})
+    err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+    if err != nil {
+        return "", err
+    }
 
-	return token.SignedString([]byte(signingkey))
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+        jwt.StandardClaims{
+            ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+            IssuedAt:  time.Now().Unix(),
+        },
+        user.Id,
+    })
+
+    return token.SignedString([]byte(signingkey))
 }
+
 
 func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -72,9 +81,11 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	return claims.UserId, nil
 }
 
-func generatePasswordHash(password string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
+func encryptedString(s string) (string, error) {
+	b, err := bcrypt.GenerateFromPassword([]byte(s), bcrypt.MinCost)
+	if err != nil {
+		return "", err
+	}
 
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+	return string(b), nil
 }
